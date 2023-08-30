@@ -62,7 +62,10 @@ const resolvers = {
             createdAt: "desc",
           },
         });
-        return messages;
+        // return messages;
+        return [
+          { body: "hey dude this is a super sick message" } as MessagePopulated,
+        ];
       } catch (error: any) {
         console.log("messages error", error);
         throw new GraphQLError(error?.message);
