@@ -62,10 +62,7 @@ const resolvers = {
             createdAt: "desc",
           },
         });
-        // return messages;
-        return [
-          { body: "hey dude this is a super sick message" } as MessagePopulated,
-        ];
+        return messages;
       } catch (error: any) {
         console.log("messages error", error);
         throw new GraphQLError(error?.message);
@@ -106,6 +103,20 @@ const resolvers = {
         });
 
         /**
+         * Find ConversationParticipant entity
+         */
+        const participant = await prisma.conversationParticipant.findFirst({
+          where: {
+            userId,
+            conversationId,
+          },
+        });
+
+        if (!participant) {
+          throw new GraphQLError("Participant does not exist");
+        }
+
+        /**
          * Update conversation entity
          */
         const conversation = await prisma.conversation.update({
@@ -117,7 +128,7 @@ const resolvers = {
             participants: {
               update: {
                 where: {
-                  id: senderId,
+                  id: participant.id,
                 },
                 data: {
                   hasSeenLatestMessage: true,
@@ -126,7 +137,7 @@ const resolvers = {
               updateMany: {
                 where: {
                   NOT: {
-                    userId: senderId,
+                    userId,
                   },
                 },
                 data: {
@@ -135,6 +146,7 @@ const resolvers = {
               },
             },
           },
+          include: conversationPopulated,
         });
 
         pubsub.publish("MESSAGE_SENT", { messageSent: newMessage });
