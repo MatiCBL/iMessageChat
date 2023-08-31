@@ -24,7 +24,7 @@ export default {
       mutation SendMessage(
         $id: String!
         $conversationId: String!
-        $sender: String!
+        $senderId: String!
         $body: String!
       ) {
         sendMessage(
@@ -38,9 +38,11 @@ export default {
   },
   Subscription: {
     messageSent: gql`
-        subscription MessageSent($conversationId: String!) { messageSent(conversationId: $conversationId) { ${MessageFields}
-             }
-        }
+        subscription MessageSent($conversationId: String!) { 
+          messageSent(conversationId: $conversationId) { 
+            ${MessageFields}
+          }
+       }
     `,
   },
 };
