@@ -6,6 +6,7 @@ import MessageOperations from "../../../../graphql/operations/message";
 import { useMutation } from "@apollo/client";
 import { SendMessageArguments } from "../../../../../../backend/src/util/types";
 import { ObjectID } from "bson";
+import { MessagesData } from "../../../../util/types";
 
 interface MessageInputProps {
   session: Session;
@@ -36,9 +37,44 @@ const MessageInput: React.FC<MessageInputProps> = ({
         body: messageBody,
       };
 
+      // Clear input state
+      setMessageBody("");
+
       const { data, errors } = await sendMessage({
         variables: {
           ...newMessage,
+        },
+        optimisticResponse: {
+          sendMessage: true,
+        },
+        update: (cache) => {
+          const existing = cache.readQuery<MessagesData>({
+            query: MessageOperations.Query.messages,
+            variables: { conversationId },
+          }) as MessagesData;
+
+          cache.writeQuery<MessagesData, { conversationId: string }>({
+            query: MessageOperations.Query.messages,
+            variables: { conversationId },
+            data: {
+              ...existing,
+              messages: [
+                {
+                  id: messageId,
+                  body: messageBody,
+                  senderId: session.user.id,
+                  conversationId,
+                  sender: {
+                    id: session.user.id,
+                    username: session.user.username,
+                  },
+                  createdAt: new Date(Date.now()),
+                  updatedAt: new Date(Date.now()),
+                },
+                ...existing.messages,
+              ],
+            },
+          });
         },
       });
 
