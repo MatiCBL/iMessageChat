@@ -1,7 +1,12 @@
 import { Prisma } from "@prisma/client";
 import { GraphQLError } from "graphql";
 import { withFilter } from "graphql-subscriptions";
-import { ConversationPopulated, GraphQLContext } from "../../util/types";
+import {
+  ConversationPopulated,
+  ConversationUpdatedSubscriptionPayload,
+  GraphQLContext,
+} from "../../util/types";
+import { userIsConversationParticipant } from "../../util/functions";
 
 const resolvers = {
   Query: {
@@ -154,15 +159,57 @@ const resolvers = {
           context: GraphQLContext
         ) => {
           const { session } = context;
+
+          if (!session?.user) {
+            throw new GraphQLError("Not authorized");
+          }
+
           const {
             conversationCreated: { participants },
           } = payload;
 
-          const userIsParticipants = !!participants.find(
-            (p) => p.userId === session?.user?.id
+          const userIsParticipant = userIsConversationParticipant(
+            participants,
+            session.user.id
           );
 
-          return userIsParticipants;
+          return userIsParticipant;
+        }
+      ),
+    },
+    conversationUpdated: {
+      subscribe: withFilter(
+        (_: any, __: any, context: GraphQLContext) => {
+          const { pubsub } = context;
+
+          return pubsub.asyncIterator(["CONVERSATION_UPDATED"]);
+        },
+        (
+          payload: ConversationUpdatedSubscriptionPayload,
+          _: any,
+          context: GraphQLContext
+        ) => {
+          const { session } = context;
+
+          console.log("HERE IS PAYLOAD", payload);
+
+          if (!session?.user) {
+            throw new GraphQLError("Not authorized");
+          }
+
+          const { id: userId } = session.user;
+          const {
+            conversationUpdated: {
+              conversation: { participants },
+            },
+          } = payload;
+
+          const userIsParticipant = userIsConversationParticipant(
+            participants,
+            userId
+          );
+
+          return userIsParticipant;
         }
       ),
     },
