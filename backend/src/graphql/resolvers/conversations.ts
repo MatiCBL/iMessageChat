@@ -191,8 +191,6 @@ const resolvers = {
         ) => {
           const { session } = context;
 
-          console.log("HERE IS PAYLOAD", payload);
-
           if (!session?.user) {
             throw new GraphQLError("Not authorized");
           }

@@ -51,8 +51,6 @@ const ConversationsWrapper: React.FC<ConversationsWrapperProps> = ({
       onData: ({ client, data }) => {
         const { data: subscriptionData } = data;
 
-        console.log("ON DATA FIRING", subscriptionData);
-
         if (!subscriptionData) return;
 
         const {
