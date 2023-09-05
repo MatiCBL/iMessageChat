@@ -1,10 +1,11 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Button, Text } from "@chakra-ui/react";
 import { Session } from "next-auth";
-import ConverstationModal from "./Modal/Modal";
+import ConversationModal from "./Modal/Modal";
 import { useState } from "react";
 import { ConversationPopulated } from "../../../../../backend/src/util/types";
 import ConversationItem from "./ConversationItem";
 import { useRouter } from "next/router";
+import { signOut } from "next-auth/react";
 
 interface ConversationListProps {
   session: Session;
@@ -35,9 +36,13 @@ const ConversationList: React.FC<ConversationListProps> = ({
   );
 
   return (
-    <Box width="100%">
+    <Box
+      width={{ base: "100%", md: "400px" }}
+      position="relative"
+      height="100%"
+      overflow="hidden"
+    >
       <Box
-        py={2}
         px={4}
         mb={4}
         bg="blackAlpha.300"
@@ -49,7 +54,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
           Find or start a conversation
         </Text>
       </Box>
-      <ConverstationModal session={session} isOpen={isOpen} onClose={onClose} />
+      <ConversationModal session={session} isOpen={isOpen} onClose={onClose} />
       {sortedConversations.map((conversation) => {
         const participant = conversation.participants.find(
           (p) => p.user.id === userId
@@ -71,6 +76,11 @@ const ConversationList: React.FC<ConversationListProps> = ({
           />
         );
       })}
+      <Box position="absolute" bottom={0} left={0} width="100%" px={8} py={6}>
+        <Button width="100%" onClick={() => signOut()}>
+          Logout
+        </Button>
+      </Box>
     </Box>
   );
 };

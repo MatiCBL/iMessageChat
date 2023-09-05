@@ -32,7 +32,7 @@ interface ModalProps {
   onClose: () => void;
 }
 
-const ConverstationModal: React.FC<ModalProps> = ({
+const ConversationModal: React.FC<ModalProps> = ({
   session,
   isOpen,
   onClose,
@@ -54,7 +54,7 @@ const ConverstationModal: React.FC<ModalProps> = ({
       ConversationOperations.Mutations.createConversation
     );
 
-  const onCreateConverstation = async () => {
+  const onCreateConversation = async () => {
     const participantIds = [userId, ...participants.map((p) => p.id)];
     try {
       const { data } = await createConversation({
@@ -142,7 +142,7 @@ const ConverstationModal: React.FC<ModalProps> = ({
                   mt={6}
                   _hover={{ bg: "brand.100" }}
                   isLoading={createConversationLoading}
-                  onClick={onCreateConverstation}
+                  onClick={onCreateConversation}
                 >
                   Create Conversation
                 </Button>
@@ -154,4 +154,4 @@ const ConverstationModal: React.FC<ModalProps> = ({
     </>
   );
 };
-export default ConverstationModal;
+export default ConversationModal;

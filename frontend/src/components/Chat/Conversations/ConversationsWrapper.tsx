@@ -5,7 +5,7 @@ import ConversationList from "./ConversationList";
 import ConversationOperations from "../../../graphql/operations/conversation";
 import {
   ConversationUpdatedData,
-  ConverstationsData,
+  ConversationsData,
 } from "../../../util/types";
 import {
   ConversationPopulated,
@@ -36,9 +36,7 @@ const ConversationsWrapper: React.FC<ConversationsWrapperProps> = ({
     error: conversationsError,
     loading: conversationsLoading,
     subscribeToMore,
-  } = useQuery<ConverstationsData>(
-    ConversationOperations.Queries.conversations
-  );
+  } = useQuery<ConversationsData>(ConversationOperations.Queries.conversations);
 
   const [markConversationAsRead] = useMutation<
     { markConversationAsRead: boolean },
@@ -190,7 +188,7 @@ const ConversationsWrapper: React.FC<ConversationsWrapperProps> = ({
   return (
     <Box
       display={{ base: conversationId ? "none" : "flex", md: "flex" }}
-      width={{ base: "100%", md: "400px" }}
+      width={{ base: "100%", md: "430px" }}
       flexDirection="column"
       bg="whiteAlpha.50"
       gap={4}
